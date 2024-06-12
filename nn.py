@@ -1,12 +1,23 @@
 import numpy as np
-import math
+from math import exp, log
 
 # TODO:
 # Create a basic feed-forward
 
 
 def sigmoid(x):
-  return 1 / (1 + math.exp(-x))
+  return 1 / (1 + exp(-x))
+
+def log_loss(y_hat, y):
+    s = 0
+    n = len(y)
+    
+    for i in range(n):
+        res = -y[i] * log(y_hat[i]) - (1 - y[i]) * log(1 - y_hat[i])
+        s += res
+    return s/n
+    
+
 
 class Layer:
 
@@ -25,6 +36,7 @@ class Layer:
 class Network:
 
     def __init__(self, layers, inp) -> None:
+        self.learning_rate = 0.0001
         self.layers = layers
         self.layers[0] = Layer(inp=inp, n_nodes=None)
         
@@ -62,7 +74,9 @@ class Network:
                 
                 # Update the number in the node
                 self.layers[i].nodes[j] = sigmoid(sum_product)
-                print(sum_product)
+        
+        def back(self):
+            pass
                         
 
     def __repr__(self) -> str:
@@ -78,9 +92,10 @@ np.random.seed(0)
 inp = np.random.rand(5)
 
 nn = Network(layers=all_layers, inp=inp)
-nn.forward()
-print(nn.layers)
-print(nn.layers[1].nodes[0])
+# nn.forward()
+# print(nn.layers)
+
+
 
 
 
