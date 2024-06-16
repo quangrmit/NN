@@ -3,6 +3,7 @@ from math import exp, log
 
 # TODO:
 # Create a basic feed-forward
+# Add bias to each layer
 
 
 def sigmoid(x):
@@ -21,7 +22,7 @@ def log_loss(y_hat, y):
 
 class Layer:
 
-    def __init__(self, n_nodes, activation=None, inp=None) -> None:
+    def __init__(self, n_nodes, activation=sigmoid, inp=None) -> None:
         self.n_nodes = n_nodes
         self.nodes = np.full((n_nodes), 0.0)
         self.activation = activation
@@ -35,10 +36,15 @@ class Layer:
 
 class Network:
 
-    def __init__(self, layers, inp) -> None:
+    def __init__(self, layers, inp, label) -> None:
+        # TODO: 
+        # Add bias for each layer
+
+
         self.learning_rate = 0.0001
         self.layers = layers
         self.layers[0] = Layer(inp=inp, n_nodes=None)
+        self.label = label
         
         # Init weights
         # The weights in between each two layers is stored in an arrays
@@ -73,10 +79,20 @@ class Network:
                     sum_product += n
                 
                 # Update the number in the node
-                self.layers[i].nodes[j] = sigmoid(sum_product)
+                activ_func = self.layers[i].activation
+                self.layers[i].nodes[j] = activ_func(sum_product)
+
+
+
         
-        def back(self):
-            pass
+    def back(self):
+        output = self.layers[-1].nodes
+
+        
+        
+
+
+
                         
 
     def __repr__(self) -> str:
@@ -92,8 +108,13 @@ np.random.seed(0)
 inp = np.random.rand(5)
 
 nn = Network(layers=all_layers, inp=inp)
-# nn.forward()
-# print(nn.layers)
+nn.forward()
+print(nn.weights)
+
+
+
+
+
 
 
 
