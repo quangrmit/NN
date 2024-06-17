@@ -33,6 +33,17 @@ def find_slope_weight(w):
 
 
 
+# (t1 - (intercept + w1 * x1 + w2 * x2 + w3 * x3)) ** 2 + 
+# (t2 - (intercept + w1 * s1 + w2 * s2 + w3 * s3)) ** 2 + 
+# (t3 - (intercept + w1 * r1 + w2 * r2 + w3 * r3)) ** 2 + 
+
+
+# 2udu
+
+# 2 * (t1 - (intercept + w1 * x1 + w2 * x2 + w3 * x3)) * -x1
+
+
+
 
 
 
@@ -86,7 +97,7 @@ def grad():
         print('\n')
 
 
-grad()
+# grad()
 
 '''
     Linear regression()
@@ -98,94 +109,124 @@ grad()
         The goal is to find the weights vector (w) and bias (b) 
 
 '''
-
-class LinearRegression:
-    def __init__(self) -> None:
-        pass
-
-    def fit(X, y):
-        learning_rate = 0.01
-        intercept = 0
-        # W will be a vector
-        w = np.random.rand(len(X[0]))
+# TODO:
+# Write this with np, might make this faster
 
 
-        def find_loss(intercept, w):
-            s = 0
-            for i in range(len(y)):
-                pred = 0
-                for a in range(len(X[i])):
-                    pred += w[a] * X[i][a]
+def fit(X, y):
+    learning_rate = 0.001
+    intercept = 0
+    print(y)
+    print(y.iloc[0])
+    print(type(y))
 
-                pred += intercept
-                loss_1_row = (y[i] - pred) ** 2
-                
-                s += loss_1_row
-            return s
+    w = np.random.rand(len(X.iloc[0]))
+
+
+    def find_loss(intercept, w):
+        s = 0
+        for i in range(len(y)):
+            pred = 0
+            for a in range(len(X.iloc[i])):
+                pred += w[a] * X.iloc[i][a]
+
+            pred += intercept
+            loss_1_row = (y[i] - pred) ** 2
+            
+            s += loss_1_row
+        return s
+    
+
+    def find_slope_intercept(intercept):
+        s = 0
+
+        for i in range(len(y)):
+            temp = 0
+            temp += np.dot(w, X.iloc[i])
+
+            temp += intercept
+            s += -2 * (y.iloc[i] - temp)
+        return s
         
 
-        def find_slope_intercept(intercept):
-            s = 0
+    def find_slope_weight(weight_ind):
+        s = 0
+        w_copy = w.copy()
+        
+        for i in range(len(y)):
 
-            for i in range(len(y)):
-                temp = 0
-                for a in range(len(X[i])):
-                    temp += w[a] * X[i][a]
-                temp += intercept
-                s += -2 * (y[i] - temp)
-            return s
+            row_calculation = np.dot(w_copy, X.iloc[i])
+            s += -2 * X.iloc[i][weight_ind] * (y.iloc[i] - (row_calculation + intercept))
+        return s
+
+
+
+    def grad():
+        step_size_intercept = 0
+        step_size_weight = np.zeros(w.shape)
+        converged = 0.001
+        count = 0
+        intercept = 0
+
+        while True:
+            count += 1
+            if count > 1000:
+                break
+            # check convergence
+
+            # if step_size_intercept <= converged:
+            #     conv = True
+            #     for i in range(len(step_size_weight)):
+            #         if step_size_weight[i] > converged:
+            #             conv = False
+            #             break
             
+            
+            slope_intercept = find_slope_intercept(intercept)
+            step_size_intercept = slope_intercept * learning_rate
+            intercept = intercept - step_size_intercept
 
-        def find_slope_weight(weight):
-            s = 0
+            if intercept == np.NaN:
+                break
 
-            for i in range(len(y)):
-                temp = 0
-                for a in range(len(X[i])):
-                    temp += w[a] * X[i][a]
-                temp += intercept
-                s += -2 * (y[i] - temp) * X[i][a]
-            return s
+            print('Begin weight tuning')
+            for i in range(len(w)):
+                # Find slope of the ith weight
+                slope_weight = find_slope_weight(i)
+                step_size_weight = slope_weight * learning_rate
 
+                print(step_size_weight)
 
+                w[i] = w[i] - step_size_weight
+                # w.iloc[i] = w.[i] - step_size_weight
+                # print(w.iloc[i])
+                print( {'intercept': intercept, 'weights': w})
 
-        def grad():
-            step_size_intercept = 0
-            step_size_weight = np.zeros(w.shape, 0.0)
-            converged = 0.001
-            count = 0
-
-            while True:
-                count += 1
-                if count > 1000:
-                    break
-                # check convergence
-                if step_size_intercept <= converged:
-                    conv = True
-                    for i in range(len(step_size_weight)):
-                        if step_size_weight > converged:
-                            conv = False
-                            break
-                
-                
-                slope_intercept = find_slope_intercept(intercept)
-                step_size_intercept = slope_intercept * learning_rate
-                intercept = intercept - step_size_intercept
+        return {'intercept': intercept, 'weights': w}
+    
+    return grad()
 
 
-                for i in range(len(w)):
-                    slope_weight = find_slope_weight(w[i])
-                    step_size_weight = slope_weight * learning_rate
-                    w[i] = w[i] - step_size_weight
 
-            return {'intercept': intercept, 'weights': w}
+def predict(X, dictionary):
+    y_pred = []
+    intercept = dictionary['intercept']
+    weights = dictionary['weights']
+
+    for i in range(len(X)):
+        y = 0
+        for j in range(len(X.iloc[i])):
+            y += weights[j] * X.iloc[i][j]
+        y += intercept
+        y_pred.append(y)
+
+    return y_pred
 
 
 
 
 
-
-
+# model.fit()
 
 
 
