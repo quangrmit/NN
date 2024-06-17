@@ -162,25 +162,34 @@ def fit(X, y):
 
 
     def grad():
-        step_size_intercept = 0
+        step_size_intercept = None
         step_size_weight = np.zeros(w.shape)
+        print('step size weight array')
         converged = 0.001
         count = 0
         intercept = 0
 
         while True:
+            print('\n')
+            print('step size weight')
+            print(step_size_weight)
+            print('step size intercept')
+            print(step_size_intercept)
+
             count += 1
             if count > 1000:
                 break
             # check convergence
-
-            # if step_size_intercept <= converged:
-            #     conv = True
-            #     for i in range(len(step_size_weight)):
-            #         if step_size_weight[i] > converged:
-            #             conv = False
-            #             break
             
+            if step_size_intercept != None:
+                if step_size_intercept < converged:
+                    conv = True
+                    for i in range(len(step_size_weight)):
+                        if step_size_weight[i] >= converged:
+                            conv = False
+                            break
+                    if conv:
+                        break
             
             slope_intercept = find_slope_intercept(intercept)
             step_size_intercept = slope_intercept * learning_rate
@@ -193,11 +202,10 @@ def fit(X, y):
             for i in range(len(w)):
                 # Find slope of the ith weight
                 slope_weight = find_slope_weight(i)
-                step_size_weight = slope_weight * learning_rate
+                step_size_weight[i] = slope_weight * learning_rate
 
-                print(step_size_weight)
 
-                w[i] = w[i] - step_size_weight
+                w[i] = w[i] - step_size_weight[i]
                 # w.iloc[i] = w.[i] - step_size_weight
                 # print(w.iloc[i])
                 print( {'intercept': intercept, 'weights': w})
